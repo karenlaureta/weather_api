@@ -2,7 +2,7 @@
 // 🌤 Ghibli Sky Weather Script
 // -------------------------
 
-const API_KEY = 'a9789a354aff167bc4490aa1b7c50791';
+const API_KEY = 'YOUR_API_KEY`';
 
 // Elements
 const rain = document.getElementById('rain');
