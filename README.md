@@ -74,8 +74,7 @@ This project uses **OpenWeatherMap API**. Replace the `API_KEY` variable in `scr
 ---
 
 ## Demo Screenshot
-
-
+![Ghibli Stopwatch Screenshot](effects/tuts.gif)
 ---
 
 ## License
