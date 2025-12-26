@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ghibli Sky Weather</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Indie+Flower&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- 🌌 Night Sky Elements -->
+  <div id="stars"></div>
+  <div id="shooting-stars"></div>
+  <div id="moon"></div>
+
+  <div class="airplane">
+    <div class="nose"></div>
+    <div class="body"></div>
+    <div class="tail"></div>
+    <div class="wing-top"></div>
+    <div class="wing-bottom"></div>
+  </div>
+
+  <!-- ☁ Parallax Clouds -->
+  <div class="cloud layer1"></div>
+  <div class="cloud layer2"></div>
+  <div class="cloud layer3"></div>
+
+  <!-- 🐦 Birds (day mode only) -->
+  <img src="effects/bird1.gif" alt="Bird 1" class="bird bird1">
+  <img src="effects/bird2.gif" alt="Bird 2" class="bird bird2">
+
+  <!-- 🌧❄ Weather Effects -->
+  <div id="rain"></div>
+  <div id="snow"></div>
+
+  <!-- 📦 Weather App -->
+  <div class="app">
+    <h1>☁ Ghibli Sky Weather</h1>
+
+    <div class="search">
+      <input
+        id="cityInput"
+        type="text"
+        placeholder="Enter city..."
+        autocomplete="off"
+      />
+      <button id="searchBtn">Search</button>
+    </div>
+
+    <div id="error"></div>
+
+    <div id="current"></div>
+    <div id="extras"></div>
+    <div id="forecast" class="forecast"></div>
+
+    <div id="themeToggle" class="toggle">☀️ / 🌙</div>
+  </div>
+
+  <!-- 🎵 Weather-based BGM -->
+  <audio id="bgm" loop></audio>
+
+  <!-- 🔊 Sound Toggle -->
+  <div id="soundToggle" class="sound-toggle">🔇</div>
+
+  <!-- JS -->
+  <script src="script.js"></script>
+</body>
+</html>
