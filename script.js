@@ -2,7 +2,7 @@
 // 🌤 Ghibli Sky Weather Script
 // -------------------------
 
-const API_KEY = 'YOUR_API_KEY`';
+const API_KEY = 'YOUR_API_KEY'; // <-- Replace with your OpenWeatherMap API key
 
 // Elements
 const rain = document.getElementById('rain');
@@ -12,25 +12,49 @@ const soundToggle = document.getElementById('soundToggle');
 const themeToggle = document.getElementById('themeToggle');
 const searchBtn = document.getElementById('searchBtn');
 const cityInput = document.getElementById('cityInput');
+const citySuggestions = document.getElementById('citySuggestions');
 const bgm = document.getElementById('bgm');
+let lastSearchedCity = '';
+let suggestionTimeout;
+
+// -------------------------
+// 🔧 Helper Functions
+// -------------------------
+function showError(msg) {
+  document.getElementById('error').textContent = msg;
+}
+
+function isValidCity(city) {
+  const cityRegex = /^[a-zA-Z\s\-']+$/;
+  return cityRegex.test(city);
+}
+
+// -------------------------
+// 🔍 Auto-suggest for City Names
+// -------------------------
+cityInput.addEventListener('input', () => {
+  const query = cityInput.value.trim();
+  citySuggestions.innerHTML = '';
+
+  if (query.length < 2) return;
+
+  clearTimeout(suggestionTimeout);
+  suggestionTimeout = setTimeout(() => fetchCitySuggestions(query), 300);
+});
 
 // -------------------------
 // 🌟 Weather Fetching
 // -------------------------
 async function getWeather(city) {
   clearEffects();
-  document.getElementById('error').textContent = '';
+  showError('');
 
   try {
-    const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
-    );
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`);
     if (!res.ok) throw new Error('City not found');
     const data = await res.json();
 
-    const fRes = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`
-    );
+    const fRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`);
     const fData = await fRes.json();
 
     renderWeather(data, fData);
@@ -38,7 +62,7 @@ async function getWeather(city) {
     applyEffects(data.weather[0].main, data.wind.speed);
     playWeatherBGM(data.weather[0].main);
   } catch (e) {
-    document.getElementById('error').textContent = e.message;
+    showError(e.message);
   }
 }
 
@@ -80,7 +104,6 @@ function applyTheme(icon) {
   if (icon.includes('n')) spawnShootingStar();
 }
 
-// Manual theme toggle
 themeToggle.addEventListener('click', () => {
   document.body.classList.toggle('night');
 });
@@ -139,12 +162,32 @@ function clearEffects() {
 }
 
 // -------------------------
-// 🔍 Search Button
+// 🔍 Search Button + Validation
 // -------------------------
-searchBtn.addEventListener('click', () => {
-  const city = cityInput.value.trim();
-  if (city) getWeather(city);
+searchBtn.addEventListener('click', handleSearch);
+cityInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleSearch();
 });
+
+function handleSearch() {
+  const city = cityInput.value.trim();
+  showError('');
+
+  if (!city) { showError('Please enter a city name.'); return; }
+  if (city.length < 2) { showError('City name is too short.'); return; }
+  if (city.length > 50) { showError('City name is too long.'); return; }
+  if (!isValidCity(city)) { showError('City name contains invalid characters.'); return; }
+  if (city.toLowerCase() === lastSearchedCity) { showError('You already searched for this city.'); return; }
+
+  searchBtn.disabled = true;
+  searchBtn.textContent = 'Searching...';
+  lastSearchedCity = city.toLowerCase();
+
+  getWeather(city).finally(() => {
+    searchBtn.disabled = false;
+    searchBtn.textContent = 'Search';
+  });
+}
 
 // -------------------------
 // 🎵 Weather-based BGM
@@ -165,7 +208,7 @@ function playWeatherBGM(weatherMain) {
     case 'Clouds': tracks = BGM.Clouds; break;
     case 'Rain': tracks = BGM.Rain; break;
     case 'Drizzle': tracks = BGM.Drizzle; break;
-    case 'Thunderstorm': tracks = BGM.Thunder; break;
+    case 'Thunderstorm': tracks = BGM.Thunderstorm; break;
     case 'Snow': tracks = BGM.Snow; break;
     default: tracks = BGM.Clear;
   }
@@ -184,16 +227,9 @@ soundToggle.addEventListener('click', () => {
   else bgm.pause();
 });
 
-// Update icon automatically
-bgm.addEventListener('play', () => {
-  soundToggle.textContent = '🔊';
-});
+bgm.addEventListener('play', () => { soundToggle.textContent = '🔊'; });
+bgm.addEventListener('pause', () => { soundToggle.textContent = '🔇'; });
 
-bgm.addEventListener('pause', () => {
-  soundToggle.textContent = '🔇';
-});
-
-// Autoplay workaround on first click
 document.body.addEventListener('click', () => {
   bgm.play().catch(() => {});
 }, { once: true });
